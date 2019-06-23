@@ -1,0 +1,54 @@
+@import "~material-colors/dist/colors.scss";
+@import url("https://fonts.googleapis.com/css?family=Puritan:400,700&display=swap");
+
+:global(body) {
+  margin: 0;
+  padding: 0;
+  // background: rgba($md-light-blue-100, 0.2);
+  // color: white;
+  font-family: "Puritan", sans-serif;
+}
+
+.main {
+  // padding: 20px;
+  margin-top: 20px;
+  max-width: 500px;
+  margin: auto;
+
+  .paper {
+    padding: 24px 36px;
+    display: flex;
+    flex-direction: column;
+    // align-items: center;
+  }
+  .button{
+    align-self: center;
+  }
+}
+
+// .button {
+//   padding: 10px;
+//   background: $md-light-blue-a700;
+//   color: white;
+//   cursor: pointer;
+//   text-align: horizontal;
+//   display: inline-block;
+//   border-radius: 3px;
+// }
+.hello {
+  color: green;
+}
+.sliderContainer {
+  width: 300px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.path {
+  fill: none;
+  stroke: $md-green-a400;
+  stroke-width: 2px;
+}
+
+.car {
+  fill: $md-light-blue-500;
+}
