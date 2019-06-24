@@ -20,8 +20,6 @@ const theme = createMuiTheme({
   }
 });
 
-// const Provider = 
-
 render(
   <ThemeProvider theme={theme}>
     <App />
