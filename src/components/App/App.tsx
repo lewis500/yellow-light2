@@ -26,10 +26,10 @@ const w1 = 500,
     .domain([0, 4]);
 
 const Road = CE("path", {
-  d: `M0,${HEIGHT / 2}L${WIDTH}${HEIGHT / 2}M${WIDTH / 2},0L${WIDTH /
-    2}${HEIGHT}`,
+  d: `M0,${HEIGHT / 2}L${WIDTH},${HEIGHT / 2}M${WIDTH * 0.75},0L${WIDTH *
+    0.75},${HEIGHT}`,
   strokeWidth: "50px",
-  stroke: colors.grey["100"]
+  stroke: colors.grey["200"]
 });
 
 type CarProps = { x: N };
@@ -38,9 +38,9 @@ const Car: FC<CarProps> = ({ x }) =>
     transform: `translate(${x} ${HEIGHT / 2})`,
     width: 20,
     height: 8,
-    x: -4,
-    y: -10,
-    fill: colors.green.A400
+    x: -10,
+    y: -4,
+    fill: colors.lightBlue.A200
   });
 
 const StyleSlider = withStyles((theme: Theme) => ({
@@ -79,8 +79,10 @@ const App: FC = () => {
       </AppBar>
       <div className={style.main}>
         <svg width={w1} height={h1} style={{ display: "inline-block" }}>
-          {Road}
-          <Car x={xScale(s)} />
+          <g transform={`translate(${margin},${margin})`}>
+            {Road}
+            <Car x={xScale(s)} />
+          </g>
         </svg>
         <Paper className={style.paper}>
           <Text variant="body1">s</Text>
@@ -124,63 +126,6 @@ const App: FC = () => {
     </>
   );
 };
-
-// const App: FC = () => {
-//   const [state, dispatch] = useThunkReducer<RootState, RA>(root, initialState);
-//   const ref = useRef<Timer | 0>(0);
-//   useEffect(() => {
-//     function stop() {
-//       if (ref.current) ref.current.stop();
-//       ref.current = null;
-//     }
-//     if (state.play) {
-//       let last = 0;
-//       ref.current = timer(t => {
-//         let dt = t - last;
-//         dispatch((dispatch, getState: () => RootState) => {
-//           let { a, v, s } = getState();
-//           dt = dt / 1000;
-//           s = s + v * dt - 0.5 * a * dt * dt;
-//           v = v - a * dt;
-//           dispatch(AC.Tick({ s, v, a }));
-//         });
-//       });
-//     } else stop();
-//     return stop;
-//   }, [state.play]);
-
-//   return (
-//     <>
-//       <AppBar position="static">
-//         <Toolbar>hello</Toolbar>
-//       </AppBar>
-//       <div className={style.main}>
-//         <svg width={w1} height={h1} style={{ display: "inline-block" }}>
-//           {Road}
-//           <Car x={xScale(state.s)} />
-//         </svg>
-//         <Paper className={style.paper}>
-//           <Text variant="body1">s</Text>
-//           <StyleSlider
-//             onChange={(e, v: N) => dispatch(AC.SetS(v))}
-//             value={state.s}
-//             step={0.1}
-//             min={0}
-//             max={4}
-//           />
-//           <Button
-//             className={style.button}
-//             variant="contained"
-//             color="secondary"
-//             onClick={() => dispatch(AC.TogglePlay())}
-//           >
-//             Play
-//           </Button>
-//         </Paper>
-//       </div>
-//     </>
-//   );
-// };
 
 export default App;
 
