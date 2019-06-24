@@ -55,22 +55,20 @@ const App: FC = () => {
   const [s, setS] = useState(0);
   const [v, setV] = useState(0.005);
 
-  const savedCallback = useRef<((dt: number) => void) | 0>(0);
+  const savedCallback = useRef<0 | ((...args: any[]) => void)>(0);
   savedCallback.current = (dt: number) => {
     setS(s + v * dt);
   };
 
   useEffect(() => {
     if (play) {
-      let last = 0;
-      let t = timer(elapsed => {
-        let dt = elapsed - last;
-        last = elapsed;
-        if (savedCallback.current) savedCallback.current(dt);
-      });
-      return () => {
-        t.stop();
-      };
+      let last = 0,
+        t = timer(elapsed => {
+          let dt = elapsed - last;
+          last = elapsed;
+          if (savedCallback.current) savedCallback.current(dt);
+        });
+      return () => t.stop();
     }
   }, [play]);
 
