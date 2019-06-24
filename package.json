@@ -27,6 +27,7 @@
     "moize": "^5.4.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-katex": "^2.0.2",
     "react-use": "^9.7.1",
     "reselect": "^4.0.0"
   },

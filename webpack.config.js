@@ -27,6 +27,15 @@ module.exports = {
         loader: "babel-loader"
       },
       {
+        test: /\.css$/,
+        // exclude: /node_modules/,
+        use: [
+          "style-loader",
+          "css-modules-typescript-loader?&localIndentName=[name]_[local]",
+          // "css-loader"
+        ]
+      },
+      {
         test: /\.scss$/,
         exclude: /node_modules/,
         use: [
@@ -50,6 +59,6 @@ module.exports = {
     alias: {
       src: resolve(__dirname, "src")
     },
-    extensions: [".ts", ".tsx", ".js", ".json", ".scss"]
+    extensions: [".ts", ".tsx", ".js",".css", ".json", ".scss"]
   }
 };

@@ -15,6 +15,7 @@ import AppBar from "@material-ui/core/AppBar";
 import { Toolbar, Typography as Text, Box, colors } from "@material-ui/core";
 import { withStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
+import { InlineMath } from "react-katex";
 
 type N = number;
 const w1 = 500,
@@ -55,13 +56,18 @@ type cb = (...args: any[]) => void;
 
 const App: FC = () => {
   const [play, setPlay] = useState(false);
-  const [s, setS] = useState(0);
-  const [v, setV] = useState(0.002);
+  const [s0, setS0] = useState(0.4);
+  const [s, setS] = useState(s0);
+  const [v0, setV0] = useState(0.002);
+  const [v, setV] = useState(v0);
 
   const savedCallback = useRef<0 | cb>(0);
   savedCallback.current = (dt: number) => {
     if (s < 3) setS(s + v * dt);
-    else setS(0);
+    else {
+      setV(v0);
+      setS(s0);
+    }
   };
 
   useLayoutEffect(() => {
@@ -89,18 +95,23 @@ const App: FC = () => {
           </g>
         </svg>
         <Paper className={style.paper}>
-          <Text variant="body1">s</Text>
+          <Text variant="body1">
+            <InlineMath math="s_0" />
+          </Text>
+
           <StyleSlider
-            onChange={(e, v: N) => setS(v)}
-            value={s}
+            onChange={(e, v: N) => setS0(v)}
+            value={s0}
             step={0.1}
             min={0}
             max={4}
           />
-          <Text variant="body1">v</Text>
+          <Text variant="body1">
+            <InlineMath math="v_0" />
+          </Text>
           <StyleSlider
-            onChange={(e, val: N) => setV(val)}
-            value={v}
+            onChange={(e, val: N) => setV0(val)}
+            value={v0}
             step={0.0001}
             min={0}
             max={0.025}
@@ -111,7 +122,7 @@ const App: FC = () => {
             color="secondary"
             onClick={() => setPlay(play => !play)}
           >
-            Play
+            {play ? "PAUSE" : "PLAY"}
           </Button>
           <Button
             className={style.button}
