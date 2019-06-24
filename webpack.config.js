@@ -26,15 +26,15 @@ module.exports = {
         exclude: /node_modules/,
         loader: "babel-loader"
       },
-      {
-        test: /\.css$/,
-        // exclude: /node_modules/,
-        use: [
-          "style-loader",
-          "css-modules-typescript-loader?&localIndentName=[name]_[local]",
-          // "css-loader"
-        ]
-      },
+      // {
+      //   test: /\.css$/,
+      //   // exclude: /node_modules/,
+      //   use: [
+      //     "style-loader",
+      //     "css-modules-typescript-loader?&localIndentName=[name]_[local]",
+      //     // "css-loader"
+      //   ]
+      // },
       {
         test: /\.scss$/,
         exclude: /node_modules/,
