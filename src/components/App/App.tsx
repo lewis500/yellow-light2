@@ -6,8 +6,6 @@ import React, {
   useState
 } from "react";
 import style from "./styleApp.scss";
-// import useThunkReducer from "src/useThunkReducer";
-// import root, { initialState, RootState, AC, RA } from "src/ducks";
 import { scaleLinear } from "d3-scale";
 import { timer, Timer } from "d3-timer";
 import Button from "@material-ui/core/Button";
@@ -113,7 +111,7 @@ const App: FC = () => {
           </Button>
           <Button
             className={style.button}
-            style={{marginTop: '10px'}}
+            style={{ marginTop: "10px" }}
             variant="contained"
             color="secondary"
             onClick={() => {

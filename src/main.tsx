@@ -5,8 +5,6 @@ import { ThemeProvider } from "@material-ui/styles";
 import { createMuiTheme } from "@material-ui/core/styles";
 import primary from "@material-ui/core/colors/blue";
 import secondary from "@material-ui/core/colors/pink";
-// import {Context} from 'src/ducks';
-// import Provider from 'src/components/Provider';
 
 const container = document.getElementById("root");
 if (!container) throw Error("no root container");
