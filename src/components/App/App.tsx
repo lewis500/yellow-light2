@@ -3,6 +3,7 @@ import React, {
   FC,
   useEffect,
   useRef,
+  useLayoutEffect,
   useState
 } from "react";
 import style from "./styleApp.scss";
@@ -17,7 +18,7 @@ import Paper from "@material-ui/core/Paper";
 
 type N = number;
 const w1 = 500,
-  h1 = 300,
+  h1 = 250,
   margin = 25,
   WIDTH = w1 - 2 * margin,
   HEIGHT = h1 - 2 * margin,
@@ -50,17 +51,20 @@ const StyleSlider = withStyles((theme: Theme) => ({
   }
 }))(Slider);
 
+type cb = (...args: any[]) => void;
+
 const App: FC = () => {
   const [play, setPlay] = useState(false);
   const [s, setS] = useState(0);
-  const [v, setV] = useState(0.005);
+  const [v, setV] = useState(0.002);
 
-  const savedCallback = useRef<0 | ((...args: any[]) => void)>(0);
+  const savedCallback = useRef<0 | cb>(0);
   savedCallback.current = (dt: number) => {
-    setS(s + v * dt);
+    if (s < 3) setS(s + v * dt);
+    else setS(0);
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (play) {
       let last = 0,
         t = timer(elapsed => {
