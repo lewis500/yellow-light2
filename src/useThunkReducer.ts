@@ -9,7 +9,7 @@ function useThunkReducer<S, A extends Action = AnyAction>(
   reducer: Reducer<S, A>,
   initialArg: S,
   init: (s: S) => S = a => a
-) {
+): [S, Dispatch<A | Thunk<S, A>>] {
   const [hookState, setHookState] = useState(init(initialArg));
 
   // State management.
@@ -22,7 +22,7 @@ function useThunkReducer<S, A extends Action = AnyAction>(
 
   // Reducer and augmented dispatcher.
   const reduce = (action: A) => reducer(getState(), action);
-  const dispatch = (action: Thunk<S, A> | A) => {
+  const dispatch: Dispatch<A | Thunk<S, A>> = (action: Thunk<S, A> | A) => {
     return typeof action === "function"
       ? action(dispatch, getState)
       : setState(reduce(action));

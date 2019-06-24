@@ -2,12 +2,12 @@ import React, {
   createElement as CE,
   FC,
   useEffect,
-  useRef,
-  useReducer
+  useRef
+  // useReducer
 } from "react";
-import useThunkReducer from "react-hook-thunk-reducer";
 import style from "./styleApp.scss";
-import root, { initialState, RootState, AC } from "src/ducks";
+import useThunkReducer from "src/useThunkReducer";
+import root, { initialState, RootState, AC, RA } from "src/ducks";
 import { scaleLinear } from "d3-scale";
 import { timer, Timer } from "d3-timer";
 import Button from "@material-ui/core/Button";
@@ -27,10 +27,6 @@ const w1 = 500,
     .range([0, WIDTH])
     .domain([0, 4]);
 
-// type RoadProps = { path: string };
-// const Road: FC<RoadProps> = ({ path: d }) =>
-//   CE("path", { d, className: style.path });
-
 const Road = CE("path", {
   d: `M0,${HEIGHT / 2}L${WIDTH}${HEIGHT / 2}M${WIDTH / 2},0L${WIDTH /
     2}${HEIGHT}`,
@@ -38,7 +34,7 @@ const Road = CE("path", {
   stroke: colors.grey["100"]
 });
 
-type CarProps = { x: N};
+type CarProps = { x: N };
 const Car: FC<CarProps> = ({ x }) =>
   CE("rect", {
     transform: `translate(${x} ${HEIGHT / 2})`,
@@ -57,8 +53,8 @@ const StyleSlider = withStyles((theme: Theme) => ({
 }))(Slider);
 
 const App: FC = () => {
-  const [state, dis] = useReducer(root, initialState),
-    ref = useRef<Timer | 0>(0);
+  const [state, dispatch] = useThunkReducer<RootState, RA>(root, initialState);
+  const ref = useRef<Timer | 0>(0);
   useEffect(() => {
     function stop() {
       if (ref.current) ref.current.stop();
@@ -68,7 +64,13 @@ const App: FC = () => {
       let last = 0;
       ref.current = timer(t => {
         let dt = t - last;
-        AC.Tick(dt / 1e3);
+        dispatch((dispatch, getState: () => RootState) => {
+          let { a, v, s } = getState();
+          dt = dt / 1000;
+          s = s + v * dt - 0.5 * a * dt * dt;
+          v = v - a * dt;
+          dispatch(AC.Tick({ s, v, a }));
+        });
       });
     } else stop();
     return stop;
@@ -87,8 +89,8 @@ const App: FC = () => {
         <Paper className={style.paper}>
           <Text variant="body1">s</Text>
           <StyleSlider
-            onChange={(e, v: N) => dis(AC.SetCar("s", v))}
-            value={state.car.s}
+            onChange={(e, v: N) => dispatch(AC.SetS(v))}
+            value={state.s}
             step={0.1}
             min={0}
             max={4}
@@ -97,7 +99,7 @@ const App: FC = () => {
             className={style.button}
             variant="contained"
             color="secondary"
-            onClick={() => dis(AC.TogglePlay())}
+            onClick={() => dispatch(AC.TogglePlay())}
           >
             Play
           </Button>
