@@ -21,35 +21,59 @@ import { InlineMath } from "react-katex";
 
 type N = number;
 
-const D = {
-  car: 3,
-  road: 10,
-  total: 80
+const widths = {
+  car: {
+    width: 3,
+    height: 1
+  },
+  road: 8,
+  total: 80,
+  start: 60
+};
+// widths.start = widths.
+
+const constants = {
+  a: 3.4,
+  v0: 18
 };
 
-const w1 = 700,
-  h1 = 175,
-  margin = 0,
-  WIDTH = w1 - 2 * margin,
-  HEIGHT = h1 - 2 * margin,
-  xScale = scaleLinear()
+const WIDTH = 700,
+  HEIGHT = 175,
+  H2 = HEIGHT / 2,
+  scale = scaleLinear()
     .range([0, WIDTH])
-    .domain([0, 4]);
-  
+    .domain([0, widths.total]);
 
-const Road = CE("path", {
-  d: `M0,${HEIGHT / 2}L${WIDTH},${HEIGHT / 2}M${WIDTH * 0.75},0L${WIDTH *
-    0.75},${HEIGHT}`,
-  strokeWidth: "50px",
-  stroke: colors.grey["200"]
-});
+const ROAD_WIDTH = scale(widths.road),
+  TOTAL = scale(widths.total),
+  START = scale(widths.start),
+  CAR_WIDTH = scale(widths.car.width),
+  CAR_HEIGHT = scale(widths.car.height),
+  R2 = ROAD_WIDTH / 2;
+
+const Road = CE("g", {}, [
+  CE("rect", {
+    height: ROAD_WIDTH,
+    width: TOTAL,
+    x: 0,
+    y: H2 - R2,
+    className: style.road
+  }),
+  CE("rect", {
+    height: HEIGHT,
+    width: ROAD_WIDTH,
+    x: START,
+    y: 0,
+    className: style.road
+  })
+]);
 
 type CarProps = { x: N; y: N };
 const Car: FunctionComponent<CarProps> = ({ x, y }) => {
   return CE("rect", {
-    width: 20,
-    height: 8,
-    y: HEIGHT / 2 + y - 4,
+    width: CAR_WIDTH,
+    height: CAR_HEIGHT,
+    y: H2 + y - 4,
     x,
     className: "hello",
     fill: colors.lightBlue.A200
@@ -58,10 +82,10 @@ const Car: FunctionComponent<CarProps> = ({ x, y }) => {
 
 const Light: FunctionComponent<{ color: string }> = ({ color }) =>
   CE("line", {
-    x1: WIDTH * 0.75 - 25 + 3,
-    x2: WIDTH * 0.75 - 25 + 3,
-    y1: HEIGHT / 2 - 25,
-    y2: HEIGHT / 2 + 25,
+    x1: START + 3,
+    x2: START + 3,
+    y1: H2 - R2,
+    y2: H2 + R2,
     strokeWidth: 6,
     stroke: color
   });
@@ -71,17 +95,17 @@ const S0Line: FunctionComponent<{ x: number }> = (() => {
     x1: 0,
     x2: 0,
     y1: 0,
-    y2: 50,
+    y2: ROAD_WIDTH,
     stroke: colors.grey["400"],
     strokeWidth: "3px"
   });
   let math = (
     <foreignObject width="30" height="30" y="50" x="-7">
-      <InlineMath math="x_0" style="transform: translateX(-50%)" />
+      <InlineMath math="x_0" />
     </foreignObject>
   );
   return ({ x }: { x: number }) => (
-    <g transform={`translate(${x},${HEIGHT / 2 - 25})`}>
+    <g transform={`translate(${x},${H2 - R2})`}>
       {line}
       {math}
     </g>
@@ -97,7 +121,7 @@ const StyleSlider = withStyles((theme: Theme) => ({
 
 type cb = (...args: any[]) => void;
 
-const a = 1;
+// const a = 1;
 
 function setTimer(callback: cb, play: boolean) {
   const savedTick = useRef<0 | cb>(0);
@@ -117,22 +141,22 @@ function setTimer(callback: cb, play: boolean) {
 
 const App: FunctionComponent<{}> = () => {
   const [play, setPlay] = useState(false),
-    [s0, setS0] = useState(0.4),
-    [v0, setV0] = useState(2),
+    [s0, setS0] = useState(5),
+    [v0, setV0] = useState(constants.v0),
     [stopper, setStopper] = useState({ s: 0, v: v0 }),
     [mover, setMover] = useState({ s: 0, v: v0 }),
     [time, setTime] = useState(0),
     [yellow, setYellow] = useState(2);
 
   setTimer((dt: N) => {
-    if (mover.s < 4 || stopper.v !== 0) {
+    if (mover.s < widths.total || stopper.v !== 0) {
       setMover(({ s, v }) => ({ v, s: s + v * dt }));
       setTime(t => dt + t);
       setStopper(({ s, v }) => {
         if (s > s0)
           return {
-            v: Math.max(v - a * dt, 0),
-            s: Math.max(s + v * dt - 0.5 * a * dt * dt, s)
+            v: Math.max(v - constants.a * dt, 0),
+            s: Math.max(s + v * dt - 0.5 * constants.a * dt * dt, s)
           };
         return { v, s: s + v * dt };
       });
@@ -145,12 +169,12 @@ const App: FunctionComponent<{}> = () => {
 
   return (
     <div className={style.main} style={{ maxWidth: "700px" }}>
-      <svg width={w1} height={h1} className={style.svg}>
-        <g transform={`translate(${margin},${margin})`}>
+      <svg width={WIDTH} height={HEIGHT} className={style.svg}>
+        <g>
           {Road}
-          <S0Line x={xScale(s0)} />
-          <Car x={xScale(mover.s)} y={-10} />
-          <Car x={xScale(stopper.s)} y={10} />
+          <S0Line x={scale(s0)} />
+          <Car x={scale(mover.s)} y={-15} />
+          <Car x={scale(stopper.s)} y={15} />
           <Light
             color={
               mover.s < s0
@@ -171,7 +195,7 @@ const App: FunctionComponent<{}> = () => {
           value={s0}
           step={0.02}
           min={0}
-          max={1.5}
+          max={widths.start}
         />
         <Text variant="body1">
           <InlineMath math="v_0" /> (speed when light changes green → yellow)
@@ -181,7 +205,7 @@ const App: FunctionComponent<{}> = () => {
           value={v0}
           step={0.1}
           min={0}
-          max={3}
+          max={constants.v0 * 2}
         />
         <Text variant="body1">
           <InlineMath math="y" /> (yellow light duration)
@@ -191,7 +215,7 @@ const App: FunctionComponent<{}> = () => {
           value={yellow}
           step={0.1}
           min={0}
-          max={3}
+          max={6}
         />
         <Button
           className={style.button}

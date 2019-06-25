@@ -7,6 +7,7 @@ interface CssExports {
   'main': string;
   'paper': string;
   'path': string;
+  'road': string;
   'sliderContainer': string;
   'svg': string;
 }
