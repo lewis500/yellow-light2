@@ -30,7 +30,6 @@ const widths = {
   total: 80,
   start: 60
 };
-// widths.start = widths.
 
 const constants = {
   a: 3.4,
@@ -42,19 +41,18 @@ const WIDTH = 700,
   H2 = HEIGHT / 2,
   scale = scaleLinear()
     .range([0, WIDTH])
-    .domain([0, widths.total]);
+    .domain([widths.start, widths.start - widths.total]);
 
-const ROAD_WIDTH = scale(widths.road),
-  TOTAL = scale(widths.total),
-  START = scale(widths.start),
-  CAR_WIDTH = scale(widths.car.width),
-  CAR_HEIGHT = scale(widths.car.height),
+const START = scale(0),
+  ROAD_WIDTH = START - scale(widths.road),
+  CAR_WIDTH = START - scale(widths.car.width),
+  CAR_HEIGHT = START - scale(widths.car.height),
   R2 = ROAD_WIDTH / 2;
 
 const Road = CE("g", {}, [
   CE("rect", {
     height: ROAD_WIDTH,
-    width: TOTAL,
+    width: WIDTH,
     x: 0,
     y: H2 - R2,
     className: style.road
@@ -91,7 +89,7 @@ const Light: FunctionComponent<{ color: string }> = ({ color }) =>
   });
 
 const S0Line: FunctionComponent<{ x: number }> = (() => {
-  let line = CE("line", {
+  const line = CE("line", {
     x1: 0,
     x2: 0,
     y1: 0,
@@ -99,7 +97,7 @@ const S0Line: FunctionComponent<{ x: number }> = (() => {
     stroke: colors.grey["400"],
     strokeWidth: "3px"
   });
-  let math = (
+  const math = (
     <foreignObject width="30" height="30" y="50" x="-7">
       <InlineMath math="x_0" />
     </foreignObject>
@@ -121,8 +119,6 @@ const StyleSlider = withStyles((theme: Theme) => ({
 
 type cb = (...args: any[]) => void;
 
-// const a = 1;
-
 function setTimer(callback: cb, play: boolean) {
   const savedTick = useRef<0 | cb>(0);
   savedTick.current = callback;
@@ -141,29 +137,29 @@ function setTimer(callback: cb, play: boolean) {
 
 const App: FunctionComponent<{}> = () => {
   const [play, setPlay] = useState(false),
-    [s0, setS0] = useState(5),
+    [s0, setS0] = useState(widths.start - 10),
     [v0, setV0] = useState(constants.v0),
-    [stopper, setStopper] = useState({ s: 0, v: v0 }),
-    [mover, setMover] = useState({ s: 0, v: v0 }),
+    [stopper, setStopper] = useState({ s: widths.start, v: v0 }),
+    [mover, setMover] = useState({ s: widths.start, v: v0 }),
     [time, setTime] = useState(0),
     [yellow, setYellow] = useState(2);
 
   setTimer((dt: N) => {
-    if (mover.s < widths.total || stopper.v !== 0) {
-      setMover(({ s, v }) => ({ v, s: s + v * dt }));
+    if (mover.s > widths.start - widths.total && mover.v > 0 ) {
+      setMover(({ s, v }) => ({ v, s: s - v * dt }));
       setTime(t => dt + t);
       setStopper(({ s, v }) => {
-        if (s > s0)
+        if (s < s0)
           return {
             v: Math.max(v - constants.a * dt, 0),
-            s: Math.max(s + v * dt - 0.5 * constants.a * dt * dt, s)
+            s: Math.min(s - v * dt + 0.5 * constants.a * dt * dt, s)
           };
-        return { v, s: s + v * dt };
+        return { v, s: s - v * dt };
       });
     } else {
       setTime(0);
-      setMover({ s: 0, v: v0 });
-      setStopper({ s: 0, v: v0 });
+      setMover({ s: widths.start, v: v0 });
+      setStopper({ s: widths.start, v: v0 });
     }
   }, play);
 
@@ -177,7 +173,7 @@ const App: FunctionComponent<{}> = () => {
           <Car x={scale(stopper.s)} y={15} />
           <Light
             color={
-              mover.s < s0
+              mover.s > s0
                 ? colors.green["400"]
                 : time > yellow
                 ? colors.red["A200"]
@@ -231,8 +227,8 @@ const App: FunctionComponent<{}> = () => {
           variant="contained"
           color="secondary"
           onClick={() => {
-            setMover(({ s, v }) => ({ v: v0, s: 0 }));
-            setStopper(({ s, v }) => ({ v: v0, s: 0 }));
+            setMover(({ s, v }) => ({ v: v0, s: widths.start }));
+            setStopper(({ s, v }) => ({ v: v0, s: widths.start }));
             setPlay(false);
           }}
         >
