@@ -8,6 +8,7 @@ interface CssExports {
   'paper': string;
   'path': string;
   'sliderContainer': string;
+  'svg': string;
 }
 declare var cssExports: CssExports;
 export = cssExports;
