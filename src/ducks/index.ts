@@ -19,15 +19,10 @@ export const initialState = {
   yellow: 2
 };
 type State = typeof initialState;
-type CarType = { x: number; v: number };
 type ActionTypes =
   | {
       type: "TICK";
-      payload: { time: number; mover: CarType; stopper: CarType };
-    }
-  | {
-      type: "SET_TIME";
-      payload: number;
+      payload: { dt: number; xssd: number };
     }
   | { type: "SET_X0"; payload: number }
   | { type: "SET_V0"; payload: number }
@@ -36,20 +31,42 @@ type ActionTypes =
   | { type: "RESET" }
   | { type: "SET_PLAY"; payload: boolean };
 
+// for (let [type, prop] of [
+//   ["SET_X0", "x0"],
+//   ["SET_V0", "v0"],
+//   ["SET_YELLOW", "yellow"],
+//   ["SET_PLAY", "play"]
+// ])
+//   if (action.type === type) return { ...state, [prop]: action.payload };
 export const reducer = (state: State, action: ActionTypes): State => {
   switch (action.type) {
     case "TICK":
-      let { time, mover, stopper } = action.payload;
+      const { dt, xssd } = action.payload;
+      let {
+        mover: { x: mx, v: mv },
+        stopper: { x: sx, v: sv },
+        v0,
+        x0
+      } = state;
+      let stopper =
+        sx <= Math.min(xssd - v0, x0)
+          ? {
+              v: Math.max(sv - params.a * dt, 0),
+              x: Math.min(sx - sv * dt + 0.5 * params.a * dt * dt, sx)
+            }
+          : {
+              v: sv,
+              x: sx - sv * dt
+            };
       return {
         ...state,
-        time,
-        mover,
+        time: state.time + dt,
+        // mover,
+        mover: {
+          x: mx - mv * dt,
+          v: mv
+        },
         stopper
-      };
-    case "SET_TIME":
-      return {
-        ...state,
-        time: action.payload
       };
     case "SET_X0":
       return {

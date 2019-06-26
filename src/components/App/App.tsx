@@ -135,27 +135,7 @@ const App: FunctionComponent<{}> = () => {
   useTimer((dt: number) => {
     dt /= params.delta;
     if (mover.x > widths.start - widths.total || stopper.v > 0) {
-      let newStopper =
-        stopper.x <= Math.min(xssd - v0 * params.tp, x0)
-          ? {
-              v: Math.max(stopper.v - params.a * dt, 0),
-              x: Math.min(
-                stopper.x - stopper.v * dt + 0.5 * params.a * dt * dt,
-                stopper.x
-              )
-            }
-          : { v: stopper.v, x: stopper.x - stopper.v * dt };
-      dispatch({
-        type: "TICK",
-        payload: {
-          mover: {
-            v: mover.v,
-            x: mover.x - mover.v * dt
-          },
-          stopper: newStopper,
-          time: time + dt
-        }
-      });
+      dispatch({ type: "TICK", payload: { dt, xssd } });
     } else {
       setTimeout(() => {
         dispatch({ type: "RESTART" });
