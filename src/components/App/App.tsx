@@ -2,6 +2,7 @@ import React, {
   createElement as CE,
   FunctionComponent,
   useContext,
+  Dispatch,
   useState,
   useReducer
 } from "react";
@@ -15,10 +16,9 @@ import Paper from "@material-ui/core/Paper";
 import useTimer from "src/useTimerHook";
 import { InlineMath } from "react-katex";
 import Vis from "src/components/Vis";
-import memoizeone from "memoize-one";
 import { params, widths } from "src/constants";
 import { makeStyles } from "@material-ui/styles";
-import { number } from "prop-types";
+import { AppContext, getxssd, getxcl, reducer, initialState } from "src/ducks";
 
 const useStyles = makeStyles({
   "@global": {
@@ -83,155 +83,52 @@ const Sliders = (() => {
     </Text>
   );
 
-  return (props: {
-    setX0: setter;
-    setV0: setter;
-    setYellow: setter;
-    x0: number;
-    v0: number;
-    yellow: number;
-  }) => (
-    <>
-      {x0Text}
-      <StyleSlider
-        onChange={(e, val: number) => props.setX0(val)}
-        value={props.x0}
-        step={0.02}
-        min={0}
-        max={widths.start}
-      />
-      {v0Text}
-      <StyleSlider
-        onChange={(e, val: number) => props.setV0(val)}
-        value={props.v0}
-        step={0.1}
-        min={0}
-        max={params.v0 * 2}
-      />
-      {yellowText}
-      <StyleSlider
-        onChange={(e, val: number) => props.setYellow(val)}
-        value={props.yellow}
-        step={0.1}
-        min={0}
-        max={6}
-      />
-    </>
-  );
+  return () => {
+    const { state, dispatch } = useContext(AppContext);
+    const { x0, v0, yellow } = state;
+    return (
+      <>
+        {x0Text}
+        <StyleSlider
+          onChange={(e, payload: number) =>
+            dispatch({ type: "SET_X0", payload })
+          }
+          value={x0}
+          step={0.02}
+          min={0}
+          max={widths.start}
+        />
+        {v0Text}
+        <StyleSlider
+          onChange={(e, payload: number) =>
+            dispatch({ type: "SET_V0", payload })
+          }
+          value={v0}
+          step={0.1}
+          min={0}
+          max={params.v0 * 2}
+        />
+        {yellowText}
+        <StyleSlider
+          onChange={(e, payload: number) =>
+            dispatch({ type: "SET_YELLOW", payload })
+          }
+          value={yellow}
+          step={0.1}
+          min={0}
+          max={6}
+        />
+      </>
+    );
+  };
 })();
 
-const getxssd = memoizeone(
-  (v0: number) => v0 * params.tp + (v0 * v0) / 2 / params.a
-);
-const getxcl = memoizeone((v0: number, yellow: number) => v0 * yellow);
-
-const initialState = {
-  play: false,
-  v0: params.v0,
-  x0: 15,
-  stopper: {
-    x: widths.start,
-    v: params.v0
-  },
-  mover: {
-    x: widths.start,
-    v: params.v0
-  },
-  time: 0,
-  useState: 2,
-  yellow: 2
-};
-type CarType = { x: number; v: number };
-type ActionTypes =
-  | {
-      type: "TICK";
-      payload: { time: number; mover: CarType; stopper: CarType };
-    }
-  | {
-      type: "SET_TIME";
-      payload: number;
-    }
-  | { type: "SET_X0"; payload: number }
-  | { type: "SET_V0"; payload: number }
-  | { type: "SET_YELLOW"; payload: number }
-  | { type: "RESTART" }
-  | { type: "RESET" }
-  | { type: "SET_PLAY"; payload: boolean };
-
-const reducer = (
-  state: typeof initialState = initialState,
-  action: ActionTypes
-): typeof initialState => {
-  let { type, payload } = action;
-  switch (type) {
-    case "TICK":
-      let { time, mover, stopper } = payload;
-      return {
-        ...state,
-        time,
-        mover,
-        stopper
-      };
-    case "SET_TIME":
-      return {
-        ...state,
-        time: payload
-      };
-    case "SET_X0":
-      return {
-        ...state,
-        x0: payload
-      };
-    case "SET_PLAY":
-      return {
-        ...state,
-        play: payload
-      };
-    case "SET_YELLOW":
-      return {
-        ...state,
-        yellow: payload
-      };
-    case "SET_V0":
-      return {
-        ...state,
-        v0: payload
-      };
-    case "RESTART":
-      return {
-        ...state,
-        mover: {
-          v: state.v0,
-          x: widths.start
-        },
-        stopper: {
-          v: state.v0,
-          x: widths.start
-        }
-      };
-    case "RESET":
-      return {
-        ...state,
-        play: false,
-        mover: {
-          v: state.v0,
-          x: widths.start
-        },
-        stopper: {
-          v: state.v0,
-          x: widths.start
-        }
-      };
-    default:
-      return state;
-  }
-};
-
+const EMPTY = {};
 const App: FunctionComponent<{}> = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const { state, dispatch } = useContext(AppContext);
   const { x0, v0, stopper, mover, time, play, yellow } = state;
 
-  const classes = useStyles();
+  const classes = useStyles(EMPTY);
   const xssd = getxssd(v0);
   const xcl = getxcl(v0, yellow);
 
@@ -279,15 +176,7 @@ const App: FunctionComponent<{}> = () => {
         })}
       </div>
       <Paper className={classes.paper} elevation={2}>
-        {Sliders({
-          setX0: (x0: number) => dispatch({ type: "SET_X0", payload: x0 }),
-          setV0: (v0: number) => dispatch({ type: "SET_V0", payload: v0 }),
-          setYellow: (yellow: number) =>
-            dispatch({ type: "SET_YELLOW", payload: yellow }),
-          x0,
-          v0,
-          yellow
-        })}
+        <Sliders />
         <Button
           className={classes.button}
           variant="contained"
@@ -312,13 +201,12 @@ const App: FunctionComponent<{}> = () => {
   );
 };
 
-export default App;
+export default () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-// export default () => (
-//   <div>
-//     <AppBar position="static">
-//       <Toolbar>hello</Toolbar>
-//     </AppBar>
-//     <App />
-//   </div>
-// );
+  return (
+    <AppContext.Provider value={{ state, dispatch }}>
+      <App />
+    </AppContext.Provider>
+  );
+};

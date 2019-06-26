@@ -4,8 +4,7 @@ import { InlineMath } from "react-katex";
 import { colors } from "@material-ui/core";
 import { scaleLinear } from "d3-scale";
 import { makeStyles } from "@material-ui/styles";
-import jss from "jss";
-
+const EMPTY = {};
 const useStyles = makeStyles({
   road: {
     fill: colors.grey["200"],
@@ -220,7 +219,7 @@ const Vis: FunctionComponent<{
   xssd: number;
   xcl: number;
 }> = ({ mover, stopper, x0, lightColor, xssd, xcl }) => {
-  const classes = useStyles();
+  const classes = useStyles(EMPTY);
   return (
     <svg width={WIDTH} height={HEIGHT} className={classes.svg}>
       <defs>
