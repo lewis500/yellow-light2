@@ -5,6 +5,8 @@ interface CssExports {
   'path': string;
   'road': string;
   'svg': string;
+  'text': string;
+  'xssd': string;
 }
 declare var cssExports: CssExports;
 export = cssExports;

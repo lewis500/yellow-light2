@@ -24,7 +24,9 @@ const START = scale(0),
   CAR_HEIGHT = START - scale(widths.car.height),
   R2 = ROAD_WIDTH / 2;
 
-export const Road = CE("g", {}, [
+export const Road = CE(
+  "g",
+  {},
   CE("rect", {
     height: ROAD_WIDTH,
     width: WIDTH,
@@ -39,7 +41,7 @@ export const Road = CE("g", {}, [
     y: 0,
     className: style.road
   })
-]);
+);
 
 export const Car: FunctionComponent<{ x: number; y: number }> = ({ x, y }) => {
   return CE("rect", {
@@ -63,23 +65,81 @@ export const Light: FunctionComponent<{ color: string }> = ({ color }) =>
   });
 
 export const S0Line: FunctionComponent<{ x: number }> = (() => {
-  const line = CE("line", {
+  const line1 = CE("line", {
     x1: 0,
     x2: 0,
     y1: 0,
+    y2: R2 - 10,
+    stroke: colors.grey["800"],
+    strokeWidth: "2px"
+  });
+  const line2 = CE("line", {
+    x1: 0,
+    x2: 0,
+    y1: R2 + 11,
     y2: ROAD_WIDTH,
     stroke: colors.grey["800"],
     strokeWidth: "2px"
   });
   const math = (
-    <foreignObject width="30" height="30" y={ROAD_WIDTH} x="-7">
+    <foreignObject width="30" height="30" y={R2 - 11} x="-7">
       <InlineMath math="x_0" />
     </foreignObject>
   );
   return ({ x }: { x: number }) => (
     <g transform={`translate(${x},${H2 - R2})`}>
-      {line}
+      {line1}
+      {line2}
       {math}
+    </g>
+  );
+})();
+
+const XssdLine: FunctionComponent<{ x: number }> = (() => {
+  let math = (
+    <foreignObject width="40" height="50" x="-8" y="2">
+      <InlineMath>{"x_{\\text{ssd}} "}</InlineMath>
+    </foreignObject>
+  );
+  return ({ x }: { x: number }) => (
+    <g transform={`translate(${x},${H2 + R2 + 3})`}>
+      {x > 45 && (
+        <foreignObject width="40" height="80" x={-x / 2 - 20} y={6}>
+          <div className={style.text}>CAN STOP</div>
+        </foreignObject>
+      )}
+      {math}
+      {CE("line", {
+        markerStart: "url(#arrow)",
+        stroke: colors.blue["400"],
+        strokeWidth: 2,
+        x2: -x,
+        x1: 0
+      })}
+    </g>
+  );
+})();
+
+const XclLine: FunctionComponent<{ x: number }> = (() => {
+  let math = (
+    <foreignObject width="30" height="30" x="-8" y="-30">
+      <InlineMath>{"x_{\\text{cl}} "}</InlineMath>
+    </foreignObject>
+  );
+
+  return ({ x }: { x: number }) => (
+    <g transform={`translate(${x},${H2 - R2 - 3})`}>
+      {math}
+      <foreignObject width="45" height="80" x={START / 2 - x / 2 - 20} y={-35}>
+        <div className={style.text}>CAN CLEAR</div>
+      </foreignObject>
+      {CE("line", {
+        markerEnd: "url(#arrow2)",
+        stroke: colors.deepOrange.A400,
+        strokeWidth: 2,
+        x2: 0,
+        x1: START - x
+      })}
     </g>
   );
 })();
@@ -89,14 +149,44 @@ const Vis: FunctionComponent<{
   stopper: { s: number };
   s0: number;
   lightColor: "red" | "green" | "yellow";
-}> = ({ mover, stopper, s0, lightColor }) => (
+  xssd: number;
+  xcl: number;
+}> = ({ mover, stopper, s0, lightColor, xssd, xcl }) => (
   <svg width={WIDTH} height={HEIGHT} className={style.svg}>
+    <defs>
+      <marker
+        id="arrow"
+        viewBox="0 0 15 15"
+        refY="5"
+        refX="8"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+        fill={colors.blue["400"]}
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" />
+      </marker>
+      <marker
+        id="arrow2"
+        viewBox="0 0 15 15"
+        refY="5"
+        refX="8"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+        fill={colors.deepOrange.A400}
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" />
+      </marker>
+    </defs>
     <g>
       {Road}
       <S0Line x={scale(s0)} />
+      <XssdLine x={scale(xssd)} />
+      <XclLine x={scale(xcl)} />
+      <Light color={lightColors[lightColor]} />
       <Car x={scale(mover.s)} y={-15} />
       <Car x={scale(stopper.s)} y={15} />
-      <Light color={lightColors[lightColor]} />
     </g>
   </svg>
 );

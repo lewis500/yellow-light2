@@ -12,9 +12,11 @@ if (!container) throw Error("no root container");
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: primary.A400
+      main: primary['500']
     },
-    secondary
+    secondary:{
+      main: secondary['500']
+    }
   }
 });
 
