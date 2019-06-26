@@ -1,5 +1,5 @@
 import React, { createElement as CE, FunctionComponent, useState } from "react";
-import style from "./styleApp.scss";
+// import style from "./styleApp.scss";
 import Button from "@material-ui/core/Button";
 import Slider from "@material-ui/lab/Slider";
 import AppBar from "@material-ui/core/AppBar";
@@ -14,13 +14,23 @@ import { params, widths } from "src/constants";
 import { makeStyles } from "@material-ui/styles";
 
 const useStyles = makeStyles({
+  "@global": {
+    body: {
+      margin: "0 !important",
+      padding: "0 !important",
+      fontFamily: " 'Puritan', sans-serif"
+    }
+  },
   main: {
     maxWidth: "900px",
     color: colors.grey["800"],
     margin: "0 auto",
     boxSizing: "border-box",
-    display: 'flex',
-    flexDirection: 'column'
+    display: "flex",
+    flexDirection: "column"
+  },
+  red: {
+    fill: colors.red["A400"]
   },
   paper: {
     maxWidth: "500px",
@@ -33,7 +43,7 @@ const useStyles = makeStyles({
     alignSelf: "center"
   },
   visContainer: {
-    margin: '0 auto',
+    margin: "0 auto"
   },
   sliderContainer: {
     width: "300px",
@@ -67,18 +77,18 @@ const Sliders = (() => {
   );
 
   return (props: {
-    setS0: setter;
+    setX0: setter;
     setV0: setter;
     setYellow: setter;
-    s0: number;
+    x0: number;
     v0: number;
     yellow: number;
   }) => (
     <>
       {x0Text}
       <StyleSlider
-        onChange={(e, val: number) => props.setS0(val)}
-        value={props.s0}
+        onChange={(e, val: number) => props.setX0(val)}
+        value={props.x0}
         step={0.02}
         min={0}
         max={widths.start}
@@ -110,10 +120,10 @@ const getxcl = memoizeone((v0: number, yellow: number) => v0 * yellow);
 
 const App: FunctionComponent<{}> = () => {
   const [play, setPlay] = useState(false),
-    [s0, setS0] = useState(widths.start - 10),
+    [x0, setX0] = useState(widths.start - 10),
     [v0, setV0] = useState(params.v0),
-    [stopper, setStopper] = useState({ s: widths.start, v: v0 }),
-    [mover, setMover] = useState({ s: widths.start, v: v0 }),
+    [stopper, setStopper] = useState({ x: widths.start, v: v0 }),
+    [mover, setMover] = useState({ x: widths.start, v: v0 }),
     [time, setTime] = useState(0),
     [yellow, setYellow] = useState(2);
 
@@ -123,26 +133,25 @@ const App: FunctionComponent<{}> = () => {
 
   useTimer((dt: number) => {
     dt /= params.delta;
-    if (mover.s > widths.start - widths.total || stopper.v > 0) {
-      setMover(({ s, v }) => ({ v, s: s - v * dt }));
+    if (mover.x > widths.start - widths.total || stopper.v > 0) {
+      setMover(({ x, v }) => ({ v, x: x - v * dt }));
       setTime(t => dt + t);
-      setStopper(({ s, v }) => {
-        if (s <= Math.min(xssd - v0 * params.tp, s0))
+      setStopper(({ x, v }) => {
+        if (x <= Math.min(xssd - v0 * params.tp, x0))
           return {
             v: Math.max(v - params.a * dt, 0),
-            s: Math.min(s - v * dt + 0.5 * params.a * dt * dt, s)
+            x: Math.min(x - v * dt + 0.5 * params.a * dt * dt, x)
           };
-        return { v, s: s - v * dt };
+        return { v, x: x - v * dt };
       });
     } else {
       setTimeout(() => {
         setTime(0);
-        setMover({ s: widths.start, v: v0 });
-        setStopper({ s: widths.start, v: v0 });
+        setMover({ x: widths.start, v: v0 });
+        setStopper({ x: widths.start, v: v0 });
       }, 200);
     }
   }, play);
-  console.log(classes);
 
   return (
     <div className={classes.main}>
@@ -151,17 +160,17 @@ const App: FunctionComponent<{}> = () => {
           mover,
           stopper,
           xcl,
-          s0,
-          lightColor: mover.s > s0 ? "green" : time > yellow ? "red" : "yellow",
+          x0,
+          lightColor: mover.x > x0 ? "green" : time > yellow ? "red" : "yellow",
           xssd
         })}
       </div>
       <Paper className={classes.paper} elevation={2}>
         {Sliders({
-          setS0,
+          setX0,
           setV0,
           setYellow,
-          s0,
+          x0,
           v0,
           yellow
         })}
@@ -179,8 +188,8 @@ const App: FunctionComponent<{}> = () => {
           variant="contained"
           color="secondary"
           onClick={() => {
-            setMover(({ s, v }) => ({ v: v0, s: widths.start }));
-            setStopper(({ s, v }) => ({ v: v0, s: widths.start }));
+            setMover(({ x, v }) => ({ v: v0, x: widths.start }));
+            setStopper(({ x, v }) => ({ v: v0, x: widths.start }));
             setPlay(false);
           }}
         >

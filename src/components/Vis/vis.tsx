@@ -3,7 +3,32 @@ import { widths } from "src/constants";
 import { InlineMath } from "react-katex";
 import { colors } from "@material-ui/core";
 import { scaleLinear } from "d3-scale";
-import style from "./styleVis.scss";
+import { makeStyles } from "@material-ui/styles";
+import jss from "jss";
+
+const useStyles = makeStyles({
+  road: {
+    fill: colors.grey["200"],
+    stroke: "none"
+  },
+  svg: {
+    display: "inline-block",
+    margin: "30px 0"
+  },
+  text: {
+    textAlign: "center",
+    fontSize: "12px",
+    fontFamily: "Puritan, sans-serif"
+  },
+  car: {
+    fill: colors.lightBlue["500"]
+  },
+  xssd: {
+    stroke: colors.green.A400,
+    strokeWidth: "2px"
+  }
+});
+type Classes = ReturnType<typeof useStyles>;
 
 const WIDTH = 700,
   HEIGHT = 175,
@@ -32,29 +57,36 @@ export const Road = CE(
     width: WIDTH,
     x: 0,
     y: H2 - R2,
-    className: style.road
+    stroke: "none",
+    fill: colors.grey["200"]
   }),
   CE("rect", {
     height: HEIGHT,
     width: ROAD_WIDTH,
     x: START,
     y: 0,
-    className: style.road
+    stroke: "none",
+    fill: colors.grey["200"]
   })
 );
 
-export const Car: FunctionComponent<{ x: number; y: number }> = ({ x, y }) => {
+export const Car: FunctionComponent<{
+  x: number;
+  y: number;
+  violation: boolean;
+}> = ({ x, y, violation }) => {
   return CE("rect", {
     width: CAR_WIDTH,
     height: CAR_HEIGHT,
+    fill: violation ? colors.red["A400"] : colors.lightBlue["A400"],
     y: H2 + y - 4,
-    x: x - CAR_WIDTH,
-    className: "hello",
-    fill: colors.lightBlue.A200
+    x: x - CAR_WIDTH
   });
 };
 
-export const Light: FunctionComponent<{ color: string }> = ({ color }) =>
+export const Light: FunctionComponent<{ color: string; classes: Classes }> = ({
+  color
+}) =>
   CE("line", {
     x1: START,
     x2: START,
@@ -64,13 +96,16 @@ export const Light: FunctionComponent<{ color: string }> = ({ color }) =>
     stroke: color
   });
 
-export const S0Line: FunctionComponent<{ x: number }> = (() => {
+export const S0Line: FunctionComponent<{
+  x: number;
+  classes: Classes;
+}> = (() => {
   const line1 = CE("line", {
     x1: 0,
     x2: 0,
     y1: 0,
     y2: R2 - 10,
-    stroke: colors.grey["800"],
+    stroke: colors.grey["500"],
     strokeWidth: "2px"
   });
   const line2 = CE("line", {
@@ -78,7 +113,7 @@ export const S0Line: FunctionComponent<{ x: number }> = (() => {
     x2: 0,
     y1: R2 + 11,
     y2: ROAD_WIDTH,
-    stroke: colors.grey["800"],
+    stroke: colors.grey["500"],
     strokeWidth: "2px"
   });
   const math = (
@@ -95,19 +130,26 @@ export const S0Line: FunctionComponent<{ x: number }> = (() => {
   );
 })();
 
-const XssdLine: FunctionComponent<{ x: number }> = (() => {
+type XssdLineProps = {
+  x: number;
+  classes: Classes;
+};
+const XssdLine = (() => {
   let math = (
     <foreignObject width="40" height="50" x="-8" y="2">
       <InlineMath>{"x_{\\text{ssd}} "}</InlineMath>
     </foreignObject>
   );
-  return ({ x }: { x: number }) => (
+  const res: FunctionComponent<XssdLineProps> = ({ x, classes }) => (
     <g transform={`translate(${x},${H2 + R2 + 3})`}>
       {x > 45 && (
-        <foreignObject width="40" height="80" x={-x / 2 - 20} y={6}>
-          <div className={style.text}>CAN STOP</div>
+        <foreignObject width="40" height="45" x={-x / 2 - 20} y={6}>
+          <div className={classes.text}>CAN STOP</div>
         </foreignObject>
       )}
+      <foreignObject width="40" height="45" x={(START - x) / 2 - 20} y={6}>
+        <div className={classes.text}>CAN'T STOP</div>
+      </foreignObject>
       {math}
       {CE("line", {
         markerStart: "url(#arrow)",
@@ -116,78 +158,119 @@ const XssdLine: FunctionComponent<{ x: number }> = (() => {
         x2: -x,
         x1: 0
       })}
+      {CE("line", {
+        markerStart: "url(#arrow3)",
+        markerEnd: "url(#arrow3)",
+        stroke: colors.grey["400"],
+        strokeWidth: 2,
+        strokeDasharray: "2 2",
+        x2: START - x,
+        x1: 0
+      })}
     </g>
   );
+  return res;
 })();
 
-const XclLine: FunctionComponent<{ x: number }> = (() => {
+const XclLine = (() => {
   let math = (
     <foreignObject width="30" height="30" x="-8" y="-30">
       <InlineMath>{"x_{\\text{cl}} "}</InlineMath>
     </foreignObject>
   );
 
-  return ({ x }: { x: number }) => (
+  const res: FunctionComponent<{ x: number; classes: Classes }> = ({
+    x,
+    classes
+  }) => (
     <g transform={`translate(${x},${H2 - R2 - 3})`}>
       {math}
-      <foreignObject width="45" height="80" x={START / 2 - x / 2 - 20} y={-35}>
-        <div className={style.text}>CAN CLEAR</div>
+      <foreignObject width="45" height="45" x={START / 2 - x / 2 - 20} y={-35}>
+        <div className={classes.text}>CAN CLEAR</div>
+      </foreignObject>
+      <foreignObject width="45" height="45" x={-x / 2 - 20} y={-35}>
+        <div className={classes.text}>CAN'T CLEAR</div>
       </foreignObject>
       {CE("line", {
         markerEnd: "url(#arrow2)",
+        markerStart: "url(#arrow2)",
         stroke: colors.deepOrange.A400,
         strokeWidth: 2,
         x2: 0,
         x1: START - x
       })}
+      {CE("line", {
+        markerEnd: "url(#arrow3)",
+        stroke: colors.grey["400"],
+        strokeWidth: 2,
+        strokeDasharray: "2,2",
+        x2: 0,
+        x1: -x
+      })}
     </g>
   );
+  return res;
 })();
 
 const Vis: FunctionComponent<{
-  mover: { s: number };
-  stopper: { s: number };
-  s0: number;
+  mover: { x: number };
+  stopper: { x: number };
+  x0: number;
   lightColor: "red" | "green" | "yellow";
   xssd: number;
   xcl: number;
-}> = ({ mover, stopper, s0, lightColor, xssd, xcl }) => (
-  <svg width={WIDTH} height={HEIGHT} className={style.svg}>
-    <defs>
-      <marker
-        id="arrow"
-        viewBox="0 0 15 15"
-        refY="5"
-        refX="8"
-        markerWidth="6"
-        markerHeight="6"
-        orient="auto-start-reverse"
-        fill={colors.blue["400"]}
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" />
-      </marker>
-      <marker
-        id="arrow2"
-        viewBox="0 0 15 15"
-        refY="5"
-        refX="8"
-        markerWidth="6"
-        markerHeight="6"
-        orient="auto-start-reverse"
-        fill={colors.deepOrange.A400}
-      >
-        <path d="M 0 0 L 10 5 L 0 10 z" />
-      </marker>
-    </defs>
-    <g>
-      {Road}
-      <S0Line x={scale(s0)} />
-      <XssdLine x={scale(xssd)} />
-      <XclLine x={scale(xcl)} />
-      <Light color={lightColors[lightColor]} />
-      <Car x={scale(mover.s)} y={-15} />
-      <Car x={scale(stopper.s)} y={15} />
-    </g>
-  </svg>
-);
+}> = ({ mover, stopper, x0, lightColor, xssd, xcl }) => {
+  const classes = useStyles();
+  return (
+    <svg width={WIDTH} height={HEIGHT} className={classes.svg}>
+      <defs>
+        <marker
+          id="arrow"
+          viewBox="0 0 15 15"
+          refY="5"
+          refX="8"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+          fill={colors.blue["400"]}
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker
+          id="arrow2"
+          viewBox="0 0 15 15"
+          refY="5"
+          refX="8"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+          fill={colors.deepOrange.A400}
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+        <marker
+          id="arrow3"
+          viewBox="0 0 15 15"
+          refY="5"
+          refX="8"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+          fill={colors.grey["400"]}
+        >
+          <path d="M 0 0 L 10 5 L 0 10 z" />
+        </marker>
+      </defs>
+      <g>
+        {Road}
+        <S0Line x={scale(x0)} classes={classes} />
+        <XssdLine x={scale(xssd)} classes={classes} />
+        <XclLine x={scale(xcl)} classes={classes} />
+        <Light color={lightColors[lightColor]} classes={classes} />
+        <Car x={scale(mover.x)} y={-15} violation={mover.x < -1} />
+        <Car x={scale(stopper.x)} y={15} violation={stopper.x < -1} />
+      </g>
+    </svg>
+  );
+};
 export default Vis;

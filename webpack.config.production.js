@@ -36,21 +36,21 @@ module.exports = {
         exclude: /node_modules/,
         loader: "babel-loader"
       },
-      {
-        test: /\.scss$/,
-        exclude: /node_modules/,
-        use: [
-          "style-loader",
-          "css-modules-typescript-loader",
-          {
-            loader: "css-loader",
-            options: {
-              modules: true
-            }
-          },
-          "sass-loader"
-        ]
-      }
+      // {
+      //   test: /\.scss$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     "style-loader",
+      //     "css-modules-typescript-loader",
+      //     {
+      //       loader: "css-loader",
+      //       options: {
+      //         modules: true
+      //       }
+      //     },
+      //     "sass-loader"
+      //   ]
+      // }
     ]
   },
   // devtool: "source-map",

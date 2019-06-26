@@ -28,10 +28,10 @@ module.exports = {
       },
       {
         test: /\.js?$/,
-        // include: resolve(__dirname, "src"),
-        // exclude: /node_modules/,
+        include: resolve(__dirname, "src"),
+        exclude: /node_modules/,
         loader: "babel-loader"
-      },
+      }
       // {
       //   test: /\.css$/,
       //   // exclude: /node_modules/,
@@ -41,30 +41,30 @@ module.exports = {
       //     // "css-loader"
       //   ]
       // },
-      {
-        test: /\.scss$/,
-        exclude: /node_modules/,
-        use: [
-          "style-loader",
-          "css-modules-typescript-loader?&localIndentName=[name]_[local]",
-          // "css-loader?&importLoaders=1&localIdentName=[name]__[local]&url=false",
-          {
-            loader: "css-loader",
-            options: {
-              modules: true,
-              // importLoaders: 1,
-              // localIdentName: "[name]__[local]"
-            }
-          },
-          "sass-loader"
-        ]
-      }
+      // {
+      //   test: /\.scss$/,
+      //   exclude: /node_modules/,
+      //   use: [
+      //     "style-loader",
+      //     "css-modules-typescript-loader?&localIndentName=[name]_[local]",
+      //     // "css-loader?&importLoaders=1&localIdentName=[name]__[local]&url=false",
+      //     {
+      //       loader: "css-loader",
+      //       options: {
+      //         modules: true,
+      //         // importLoaders: 1,
+      //         // localIdentName: "[name]__[local]"
+      //       }
+      //     },
+      //     "sass-loader"
+      //   ]
+      // }
     ]
   },
   resolve: {
     alias: {
       src: resolve(__dirname, "src")
     },
-    extensions: [".ts", ".tsx", ".js",".css", ".json", ".scss"]
+    extensions: [".ts", ".js", ".tsx"]
   }
 };
