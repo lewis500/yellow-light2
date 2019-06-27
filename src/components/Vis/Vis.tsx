@@ -1,9 +1,9 @@
 import React, { createElement as CE, FunctionComponent } from "react";
 import { widths } from "src/constants";
-import { InlineMath } from "react-katex";
 import { colors } from "@material-ui/core";
 import { scaleLinear } from "d3-scale";
 import { makeStyles } from "@material-ui/styles";
+import TeX from "@matejmazur/react-katex";
 const EMPTY = {};
 const useStyles = makeStyles({
   road: {
@@ -12,7 +12,11 @@ const useStyles = makeStyles({
   },
   svg: {
     display: "inline-block",
-    margin: "30px 0"
+    margin: "30px 0",
+    "& text": {
+      fontFamily: "Puritan, san-serif",
+      fontSize: "13px"
+    }
   },
   text: {
     textAlign: "center",
@@ -117,7 +121,7 @@ export const S0Line: FunctionComponent<{
   });
   const math = (
     <foreignObject width="30" height="30" y={R2 - 11} x="-7">
-      <InlineMath math="x_0" />
+      <TeX math="x_0" />
     </foreignObject>
   );
   return ({ x }: { x: number }) => (
@@ -136,7 +140,7 @@ type XssdLineProps = {
 const XssdLine = (() => {
   let math = (
     <foreignObject width="40" height="50" x="-8" y="2">
-      <InlineMath>{"x_{\\text{ssd}} "}</InlineMath>
+      <TeX>{"x_{\\text{ssd}} "}</TeX>
     </foreignObject>
   );
   const res: FunctionComponent<XssdLineProps> = ({ x, classes }) => (
@@ -174,7 +178,7 @@ const XssdLine = (() => {
 const XclLine = (() => {
   let math = (
     <foreignObject width="30" height="30" x="-8" y="-30">
-      <InlineMath>{"x_{\\text{cl}} "}</InlineMath>
+      <TeX>{"x_{\\text{cl}} "}</TeX>
     </foreignObject>
   );
 
@@ -266,7 +270,7 @@ const Vis: FunctionComponent<{
         <XssdLine x={scale(xssd)} classes={classes} />
         <XclLine x={scale(xcl)} classes={classes} />
         <Light color={lightColors[lightColor]} classes={classes} />
-        <Car x={scale(mover.x)} y={-15} violation={mover.x < -1} />
+        <Car x={scale(mover.x)} y={-15} violation={mover.x < -1 && x0 > xcl} />
         <Car x={scale(stopper.x)} y={15} violation={stopper.x < -1} />
       </g>
     </svg>

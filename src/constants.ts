@@ -11,6 +11,8 @@ export const widths = {
 export const params = {
   a: 3.4,
   v0: 18,
-  delta: .6,
-  tp: .75
+  v0Max: 21,
+  yellowMax: 3.5,
+  delta: 0.6,
+  tp: 0.75
 };

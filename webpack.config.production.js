@@ -36,16 +36,57 @@ module.exports = {
         exclude: /node_modules/,
         loader: "babel-loader"
       },
+      {
+        test: /\.js?$/,
+        include: resolve(__dirname, "src"),
+        exclude: /node_modules/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        // exclude: /node_modules/,
+        use: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.woff(2)?$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10000,
+              name: "./font/[hash].[ext]",
+              mimetype: "application/font-woff"
+            }
+          }
+        ]
+      },
+      {
+        test: /\.ttf$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10000,
+              name: "./font/[hash].[ext]",
+              // mimetype: 'application/font-woff'
+              mimetype: "application/x-font-ttf"
+            }
+          }
+        ]
+      }
       // {
       //   test: /\.scss$/,
       //   exclude: /node_modules/,
       //   use: [
       //     "style-loader",
-      //     "css-modules-typescript-loader",
+      //     "css-modules-typescript-loader?&localIndentName=[name]_[local]",
+      //     // "css-loader?&importLoaders=1&localIdentName=[name]__[local]&url=false",
       //     {
       //       loader: "css-loader",
       //       options: {
-      //         modules: true
+      //         modules: true,
+      //         // importLoaders: 1,
+      //         // localIdentName: "[name]__[local]"
       //       }
       //     },
       //     "sass-loader"

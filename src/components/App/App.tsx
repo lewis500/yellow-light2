@@ -1,24 +1,17 @@
-import React, {
-  createElement as CE,
-  FunctionComponent,
-  useContext,
-  Dispatch,
-  useState,
-  useReducer
-} from "react";
-// import style from "./styleApp.scss";
+import React, { FunctionComponent, useContext, useReducer } from "react";
 import Button from "@material-ui/core/Button";
 import Slider from "@material-ui/lab/Slider";
-import AppBar from "@material-ui/core/AppBar";
 import { Toolbar, Typography as Text, colors } from "@material-ui/core";
 import { withStyles, Theme } from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import useTimer from "src/useTimerHook";
-import { InlineMath } from "react-katex";
+// import { TeX } from "react-katex";
 import Vis from "src/components/Vis";
+import Plot from "src/components/Plot";
 import { params, widths } from "src/constants";
 import { makeStyles } from "@material-ui/styles";
 import { AppContext, getxssd, getxcl, reducer, initialState } from "src/ducks";
+import TeX from "@matejmazur/react-katex";
 
 const useStyles = makeStyles({
   "@global": {
@@ -59,7 +52,7 @@ const useStyles = makeStyles({
   }
 });
 
-type setter = React.Dispatch<React.SetStateAction<number>>;
+// type setter = React.Dispatch<React.SetStateAction<number>>;
 const Sliders = (() => {
   const StyleSlider = withStyles((theme: Theme) => ({
     root: {
@@ -69,17 +62,17 @@ const Sliders = (() => {
   }))(Slider);
   const x0Text = (
     <Text variant="body1">
-      <InlineMath math="x_0" /> (position when light turns green → yellow)
+      <TeX math="x_0" /> (position when light turns green → yellow)
     </Text>
   );
   const v0Text = (
     <Text variant="body1">
-      <InlineMath math="v_0" /> (speed when light changes green → yellow)
+      <TeX math="v_0" /> (speed when light changes green → yellow)
     </Text>
   );
   const yellowText = (
     <Text variant="body1">
-      <InlineMath math="t_y" /> (yellow light duration)
+      <TeX math="t_y" /> (yellow light duration)
     </Text>
   );
 
@@ -106,7 +99,7 @@ const Sliders = (() => {
           value={v0}
           step={0.1}
           min={0}
-          max={params.v0 * 2}
+          max={params.v0Max}
         />
         {yellowText}
         <StyleSlider
@@ -116,7 +109,7 @@ const Sliders = (() => {
           value={yellow}
           step={0.1}
           min={0}
-          max={6}
+          max={params.yellowMax}
         />
       </>
     );
@@ -139,7 +132,7 @@ const App: FunctionComponent<{}> = () => {
     } else {
       setTimeout(() => {
         dispatch({ type: "RESTART" });
-      }, 200);
+      }, 0);
     }
   }, play);
 
@@ -151,7 +144,12 @@ const App: FunctionComponent<{}> = () => {
           stopper,
           xcl,
           x0,
-          lightColor: mover.x > x0 ? "green" : time > yellow ? "red" : "yellow",
+          lightColor:
+            time < (widths.start - x0) / v0
+              ? "green"
+              : time - (widths.start - x0) / v0 < yellow
+              ? "yellow"
+              : "red",
           xssd
         })}
       </div>
@@ -177,6 +175,9 @@ const App: FunctionComponent<{}> = () => {
           Reset
         </Button>
       </Paper>
+      <div style={{ margin: "0 auto" }}>
+        <Plot />
+      </div>
     </div>
   );
 };

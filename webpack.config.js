@@ -31,16 +31,42 @@ module.exports = {
         include: resolve(__dirname, "src"),
         exclude: /node_modules/,
         loader: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        // exclude: /node_modules/,
+        use: [
+          "style-loader",
+          "css-loader"
+        ]
+      },
+      {
+        test: /\.woff(2)?$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10000,
+              name: "./font/[hash].[ext]",
+              mimetype: "application/font-woff"
+            }
+          }
+        ]
+      },
+      {
+        test: /\.ttf$/,
+        use: [
+          {
+            loader: "url-loader",
+            options: {
+              limit: 10000,
+              name: "./font/[hash].[ext]",
+              // mimetype: 'application/font-woff'
+              mimetype: "application/x-font-ttf"
+            }
+          }
+        ]
       }
-      // {
-      //   test: /\.css$/,
-      //   // exclude: /node_modules/,
-      //   use: [
-      //     "style-loader",
-      //     "css-modules-typescript-loader?&localIndentName=[name]_[local]",
-      //     // "css-loader"
-      //   ]
-      // },
       // {
       //   test: /\.scss$/,
       //   exclude: /node_modules/,
@@ -65,6 +91,6 @@ module.exports = {
     alias: {
       src: resolve(__dirname, "src")
     },
-    extensions: [".ts", ".js", ".tsx"]
+    extensions: [".ts", ".js", ".css", ".tsx"]
   }
 };
