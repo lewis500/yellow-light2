@@ -8,8 +8,8 @@ module.exports = {
     main: "./src/main.tsx"
   },
   output: {
-    path: resolve(__dirname, "public"),
-    // publicPath: "public/",
+    path: resolve(__dirname, "docs"),
+    // publicPath: "docs/",
     filename: "[name].js"
   },
   mode: "production",
@@ -22,7 +22,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: resolve(__dirname, "src", "index.html"),
-      filename: resolve(__dirname, "index.html")
+      filename: resolve(__dirname, "docs", "index.html")
     }),
     new webpack.DefinePlugin({
       __NODE_ENV__: JSON.stringify("production")

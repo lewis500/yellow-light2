@@ -3,6 +3,6 @@ node_modules/
 *.log
 # *.lock
 flow-typed/
-public/
+# public/
 TODO.md
 TODO
