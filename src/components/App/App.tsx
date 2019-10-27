@@ -1,11 +1,9 @@
 import React, { FunctionComponent, useContext, useReducer } from "react";
 import Button from "@material-ui/core/Button";
-import Slider from "@material-ui/lab/Slider";
+import Slider from "@material-ui/core/Slider";
 import { Toolbar, Typography as Text, colors } from "@material-ui/core";
 import { withStyles, Theme } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
 import useTimer from "src/useTimerHook";
-// import { TeX } from "react-katex";
 import Vis from "src/components/Vis";
 import Plot from "src/components/Plot";
 import { params, widths } from "src/constants";
