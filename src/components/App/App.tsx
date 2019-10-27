@@ -22,12 +22,13 @@ const useStyles = makeStyles({
     }
   },
   main: {
-    maxWidth: "900px",
+    // maxWidth: "900px",
     color: colors.grey["800"],
     margin: "0 auto",
     boxSizing: "border-box",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "row",
+    justifyContent: "center"
   },
   red: {
     fill: colors.red["A400"]
@@ -40,15 +41,42 @@ const useStyles = makeStyles({
     flexDirection: "column"
   },
   button: {
-    alignSelf: "center"
+    // alignSelf: "center"
   },
   visContainer: {
-    margin: "0 auto"
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    paddingRight: "30px"
+
+    // margin: "0 auto"
   },
   sliderContainer: {
     width: "300px",
     padding: "20px",
     boxSizing: "border-box"
+  },
+  title: {
+    backgroundColor: colors.lightBlue["A700"],
+    color: "white",
+    width: "100%",
+    height: "70px",
+    display: "flex",
+    fontFamily: "Helvetica",
+    boxShadow: " 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)",
+    marginBottom: "25px",
+    alignItems: "center",
+    padding: "5px 30px",
+    fontSize: "22px",
+    boxSizing: "border-box",
+    "& a": {
+      color: "white",
+      textDecoration: "none"
+    },
+    "& a:hover": {
+      color: colors.pink["100"],
+      cursor: "pointer"
+    }
   }
 });
 
@@ -137,48 +165,62 @@ const App: FunctionComponent<{}> = () => {
   }, play);
 
   return (
-    <div className={classes.main}>
-      <div className={classes.visContainer}>
-        {Vis({
-          mover,
-          stopper,
-          xcl,
-          x0,
-          lightColor:
-            time < (widths.start - x0) / v0
-              ? "green"
-              : time - (widths.start - x0) / v0 < yellow
-              ? "yellow"
-              : "red",
-          xssd
-        })}
+    <>
+      <div className={classes.title}>
+        <div>Construction Zone</div>
       </div>
-      <Paper className={classes.paper} elevation={2}>
-        <Sliders />
-        <Button
-          className={classes.button}
-          variant="contained"
-          color="secondary"
-          onClick={() => dispatch({ type: "SET_PLAY", payload: !play })}
-        >
-          {play ? "PAUSE" : "PLAY"}
-        </Button>
-        <Button
-          className={classes.button}
-          style={{ marginTop: "10px" }}
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            dispatch({ type: "RESET" });
-          }}
-        >
-          Reset
-        </Button>
-      </Paper>
-      <div style={{ margin: "0 auto" }}>
-        <Plot />
+      <div className={classes.main}>
+        <div className={classes.visContainer}>
+          <div style={{ marginBottom: "30px" }}>
+            {Vis({
+              mover,
+              stopper,
+              xcl,
+              x0,
+              lightColor:
+                time < (widths.start - x0) / v0
+                  ? "green"
+                  : time - (widths.start - x0) / v0 < yellow
+                  ? "yellow"
+                  : "red",
+              xssd
+            })}
+          </div>
+          <Plot />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <Sliders />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-around"
+            }}
+          >
+            <Button
+              className={classes.button}
+              variant="contained"
+              color="secondary"
+              onClick={() => dispatch({ type: "SET_PLAY", payload: !play })}
+            >
+              {play ? "PAUSE" : "PLAY"}
+            </Button>
+            <Button
+              className={classes.button}
+              variant="contained"
+              color="secondary"
+              component="div"
+              onClick={() => {
+                dispatch({ type: "RESET" });
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+          <div></div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
